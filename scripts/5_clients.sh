@@ -16,7 +16,7 @@ openssl x509 -req \
   -out ./certs/generated/fullchain.pem \
   -days 365 \
   -extfile \
-  <(echo "[server_ext]"; echo "extendedKeyUsage=serverAuth,clientAuth"; echo "subjectAltName=DNS:*.130.211.58.17.nip.io")
+  <(echo "[server_ext]"; echo "extendedKeyUsage=serverAuth,clientAuth"; echo "subjectAltName=DNS:*.$DOMAIN")
 
 
 openssl pkcs12 -export -in ./certs/generated/fullchain.pem \
