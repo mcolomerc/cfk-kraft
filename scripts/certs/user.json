@@ -1,0 +1,14 @@
+{
+    "CN": "javaclient",
+    "key": {
+      "algo": "rsa",
+      "size": 2048
+    },
+    "names": [
+      {
+        "C": "Spain",
+        "ST": "Valencia",
+        "L": "Valencia"
+      }
+    ]
+  }

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sr-ingress
+  namespace: confluent 
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false" 
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: "nginx"  
+spec:  
+  rules:
+  - host: schemaregistry.$DOMAIN
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: schemaregistry-0-internal
+            port:
+              number: 8081
