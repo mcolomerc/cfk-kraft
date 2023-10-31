@@ -5,26 +5,7 @@ This is a playground for [KRAFT](https://developer.confluent.io/learn/kraft/) ru
 ## Prerequisites
 
 - A Kubernetes cluster.
-
-- GKE (example):
-
-```sh
-gcloud beta container --project <PROJECT_ID> clusters create "cluster-gke-1" \
---zone "<ZONE>" --no-enable-basic-auth --cluster-version "1.27.3-gke.100" \
---release-channel "regular" --machine-type "e2-standard-4" --image-type "COS_CONTAINERD" \
---disk-type "pd-balanced" --disk-size "500" --metadata disable-legacy-endpoints=true \
---scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write", \
-"https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol", \
-"https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
---max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias \ 
---network "projects/<PROJECT_ID>/global/networks/<NETWORK_ID>" \ 
---subnetwork "projects/<PROJECT_ID>/regions/<REGION>/subnetworks/<SUBNETID>" \
---no-enable-intra-node-visibility --default-max-pods-per-node "110" \ 
---no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver \
---enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
---enable-shielded-nodes --node-locations "<ZONE>"
-```
-
+  
 - [Kubectl](https://kubernetes.io/docs/reference/kubectl/), with cluster context configured.
   
 - [Helm](https://helm.sh/)
@@ -32,12 +13,6 @@ gcloud beta container --project <PROJECT_ID> clusters create "cluster-gke-1" \
 - [OpenSSL](https://www.openssl.org/): `openssl` command line tool.
 
 - [CFSSL](https://github.com/cloudflare/cfssl) command: `cfssl`
-
-GKE (example):
-  
-```sh
-gcloud container clusters get-credentials cluster-gke-1 --zone <ZONE> --project <PROJECT_ID>
-```
 
 ## CFK
 
@@ -169,4 +144,31 @@ ssl.key.location=client_?????_client.key
 
 # Key password, if any.
 ssl.key.password=abcdefgh
+```
+
+## Extra - GKE
+
+- Create GKE (example):
+
+```sh
+gcloud beta container --project <PROJECT_ID> clusters create "cluster-gke-1" \
+--zone "<ZONE>" --no-enable-basic-auth --cluster-version "1.27.3-gke.100" \
+--release-channel "regular" --machine-type "e2-standard-4" --image-type "COS_CONTAINERD" \
+--disk-type "pd-balanced" --disk-size "500" --metadata disable-legacy-endpoints=true \
+--scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write", \
+"https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol", \
+"https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+--max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias \ 
+--network "projects/<PROJECT_ID>/global/networks/<NETWORK_ID>" \ 
+--subnetwork "projects/<PROJECT_ID>/regions/<REGION>/subnetworks/<SUBNETID>" \
+--no-enable-intra-node-visibility --default-max-pods-per-node "110" \ 
+--no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver \
+--enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
+--enable-shielded-nodes --node-locations "<ZONE>"
+```
+
+- Get GKE credentials (example):
+  
+```sh
+gcloud container clusters get-credentials cluster-gke-1 --zone <ZONE> --project <PROJECT_ID>
 ```
