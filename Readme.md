@@ -106,6 +106,7 @@ kubectl apply -f ./crds/producer.yaml
 it uses `kafka-client-config-secure` secret created previously.
 
 ```yaml
+   ...
       volumes:
         # This application pod will mount a volume for Kafka client properties from 
         # the secret `kafka-client-config-secure`
@@ -120,7 +121,7 @@ it uses `kafka-client-config-secure` secret created previously.
             secretName: kafka-generated-jks
 ```
 
-#### External clients
+#### External clients (mTLS authentication)
 
 Client certificates: `script/5_clients.sh`
 
