@@ -128,12 +128,9 @@ Client certificates: `script/5_clients.sh`
 Use custom certificates. `scripts/config/external.properties`
 
 ```properties
-security.protocol=SSL
-
+security.protocol=SSL 
 ssl.truststore.type=PEM
-ssl.truststore.location=<FULL_PATH>/certs/generated/cacerts.pem
-security.protocol=SSL
-
+ssl.truststore.location=<FULL_PATH>/certs/generated/cacerts.pem 
 ssl.keystore.type=PKCS12
 ssl.keystore.location=<FULL_PATH>/certs/generated/user.p12
 ssl.keystore.password=changeme
