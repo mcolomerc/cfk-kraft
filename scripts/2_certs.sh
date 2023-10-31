@@ -1,5 +1,7 @@
 #!/bin/sh
 
+openssl genrsa -out ./certs/generated/rootCAkey.pem 2048
+
 openssl req -x509 -new -nodes -key ./certs/generated/rootCAkey.pem -days 3650 -out ./certs/generated/cacerts.pem -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=TestCA"
  
 openssl x509 -in ./certs/generated/cacerts.pem -text -noout 
