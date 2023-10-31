@@ -122,6 +122,8 @@ it uses `kafka-client-config-secure` secret created previously.
 
 #### External clients
 
+Client certificates: `script/5_clients.sh`
+
 Use custom certificates. `scripts/config/external.properties`
 
 ```properties
