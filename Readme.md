@@ -181,3 +181,151 @@ gcloud beta container --project <PROJECT_ID> clusters create "cluster-gke-1" \
 ```sh
 gcloud container clusters get-credentials cluster-gke-1 --zone <ZONE> --project <PROJECT_ID>
 ```
+
+## Authorizer
+
+Adding ACLs to the Kafka cluster.
+
+- Internal authentication using mTLS.
+- External authentication using SASL SSL.
+
+### Kraft Controller Authorizer
+
+ACL Authorizer for Kraft Controller (StandardAuthorizer).
+
+`KraftController` CRD: 
+
+```yaml
+spec: 
+  authorization: 
+    type: simple
+    superUsers:
+    - User:kafka
+    - User:kraftcontroller
+  configOverrides:
+    server:
+      - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+```
+
+### Kafka Broker Authorizer
+
+ACL Authorizer for Kafka Broker (StandardAuthorizer).
+
+`Kafka` CRD: 
+
+```yaml
+spec: 
+  authorization: 
+    type: simple
+    superUsers:
+    - User:kafka
+    - User:kraftcontroller
+  configOverrides:
+    server:
+      - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+```
+
+Internal authentication using mTLS:
+
+```yaml
+spec:
+  listeners:
+    internal:
+      authentication:
+        type: mtls
+        principalMappingRules:
+          - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
+    external:
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: credential
+```
+
+#### Clients
+
+External authentication using SASL SSL:
+
+`kafka` user configuration: `external.properties`
+
+```properties
+security.protocol=SASL_SSL
+
+ssl.truststore.type=PEM
+ssl.truststore.location=<FULL_PATH>/certs/generated/cacerts.pem
+ 
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="kafka-secret";
+
+sasl.mechanism=PLAIN
+```
+
+### Configure ACLs
+
+Add permissions to the `test`user to produce and consume from the `demo.topic` topic.
+
+See `users/plain-users.json`.
+
+Configure ACLS (using `kafka` user):
+
+```sh
+kafka-acls --bootstrap-server kafka.$DOMAIN:443 \
+  --command-config <FULL_PATH>/external.properties \
+  --add \
+  --allow-principal User:'test' \
+  --operation All \
+  --topic demo.topic
+ 
+Adding ACLs for resource `ResourcePattern(resourceType=TOPIC, name=demo.topic, patternType=LITERAL)`: 
+        (principal=User:test, host=*, operation=ALL, permissionType=ALLOW) 
+```
+
+### Test user
+
+Configure user: `test.properties`
+
+```properties
+security.protocol=SASL_SSL
+
+ssl.truststore.type=PEM
+ssl.truststore.location=<FULL_PATH>/certs/generated/cacerts.pem
+ 
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="test" password="test123";
+
+sasl.mechanism=PLAIN
+```
+
+`test` user can describe the `demo.topic` topic:
+
+```sh
+kafka-topics --bootstrap-server kafka.$DOMAIN:443 --command-config <PATH>/test.properties --topic demo.topic --describe                                                                                 
+  
+Topic: demo.topic    TopicId: uvihRw2ZRbCUPyPhDIKWZg PartitionCount: 4       ReplicationFactor: 3    Configs: min.insync.replicas=2,cleanup.policy=delete,segment.bytes=1073741824,message.format.version=3.0-IV1
+        Topic: demo.topic       Partition: 0    Leader: 1       Replicas: 1,2,0 Isr: 2,1,0
+        Topic: demo.topic       Partition: 1    Leader: 2       Replicas: 2,0,1 Isr: 2,1,0
+        Topic: demo.topic       Partition: 2    Leader: 0       Replicas: 0,1,2 Isr: 2,1,0
+        Topic: demo.topic       Partition: 3    Leader: 0       Replicas: 0,1,2 Isr: 2,1,0
+```
+
+Testing with unauthorized user:
+
+```sh
+Error while executing topic command : Topic 'demo.topic' does not exist as expected 
+```
+
+### Authorizer logs
+
+Enable DEBUG log level for the authorizer in the `Kafka` and in the `KraftController`CRD:
+
+```yaml
+spec: 
+  configOverrides:
+    server:
+      - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+    log4j:  
+      - log4j.logger.kafka.authorizer.logger=DEBUG, authorizerAppender
+      - log4j.appender.authorizerAppender=org.apache.log4j.ConsoleAppender
+      - log4j.appender.authorizerAppender.DatePattern='.'yyyy-MM-dd-HH 
+      - log4j.appender.authorizerAppender.layout=org.apache.log4j.PatternLayout
+      - log4j.appender.authorizerAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+```
+
