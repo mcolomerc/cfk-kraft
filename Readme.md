@@ -329,3 +329,41 @@ spec:
       - log4j.appender.authorizerAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
 ```
 
+## Monitoring
+
+Script: `./monitoring/monitoring.sh`
+
+- `monitoring` namespace
+- Prometheus deployment
+- Grafana deployment
+- Grafana ingress
+
+### Prometheus & Grafana
+
+#### Prometheus
+
+There is no Ingress rules for Prometheus, if you need to access the Prometheus Web:
+
+`kubectl port-forward --namespace monitoring svc/prometheus-server 9090:80`
+
+Then use [http://localhost:9090/](http://localhost:9090/) to access the Prometheus Web UI.
+
+#### Grafana
+
+Update `./monitoring/grafana/ingress.yaml` with your domain name.
+
+Use [http://monitoring.<DOMAIN>/](http://monitoring.<DOMAIN>) to access Grafana.
+
+- Get your 'admin' user password:
+
+`kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode`
+
+##### Dashboards
+
+Dashboards (JSON files) are located in `./monitoring/grafana/dashboards`.
+
+- Kraft Controller (./monitoring/grafana/dashboards/cp-kraft.json)
+- Confluent Platform (./monitoring/grafana/dashboards/confluentplatform.json)
+- Confluent Platform - Overview (./monitoring/grafana/dashboards/cp-overview.json)
+- Confluent Operator (./monitoring/grafana/dashboards/cfk-operator.json)
+- Confluent Connect (./monitoring/grafana/dashboards/connect-dashboard.json)
