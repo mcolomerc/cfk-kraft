@@ -352,7 +352,7 @@ Then use [http://localhost:9090/](http://localhost:9090/) to access the Promethe
 
 Update `./monitoring/grafana/ingress.yaml` with your domain name.
 
-Use [http://monitoring.<DOMAIN>/](http://monitoring.<DOMAIN>) to access Grafana.
+Use [http://monitoring.< $DOMAIN >/](http://monitoring.< $DOMAIN >) to access Grafana.
 
 - Get your 'admin' user password:
 
